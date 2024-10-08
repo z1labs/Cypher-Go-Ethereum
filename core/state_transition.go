@@ -119,7 +119,7 @@ func IntrinsicGas(data []byte, accessList types.AccessList, isContractCreation b
 		gas += uint64(len(accessList)) * params.TxAccessListAddressGas
 		gas += uint64(accessList.StorageKeys()) * params.TxAccessListStorageKeyGas
 	}
-	return fhevm.TxDataFractionalGas(gas), nil;
+	return fhevm.TxDataFractionalGas(gas), nil
 }
 
 // toWordSize returns the ceiled word size required for init code payment calculation.

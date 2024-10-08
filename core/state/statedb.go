@@ -160,7 +160,7 @@ func New(root common.Hash, db Database, snaps *snapshot.Tree) (*StateDB, error) 
 			unexpectedBalanceDelta: new(big.Int),
 			openWasmPages:          0,
 			everWasmPages:          0,
-			activatedWasms:         make(map[common.Hash]*ActivatedWasm),
+			activatedWasms:         make(map[common.Hash]ActivatedWasm),
 			recentWasms:            NewRecentWasms(),
 		},
 
@@ -722,7 +722,11 @@ func (s *StateDB) Copy() *StateDB {
 	state := &StateDB{
 		arbExtraData: &ArbitrumExtraData{
 			unexpectedBalanceDelta: new(big.Int).Set(s.arbExtraData.unexpectedBalanceDelta),
+<<<<<<< HEAD
 			activatedWasms:         make(map[common.Hash]*ActivatedWasm, len(s.arbExtraData.activatedWasms)),
+=======
+			activatedWasms:         make(map[common.Hash]ActivatedWasm, len(s.arbExtraData.activatedWasms)),
+>>>>>>> 64230029 (feat: arbos32)
 			recentWasms:            s.arbExtraData.recentWasms.Copy(),
 			openWasmPages:          s.arbExtraData.openWasmPages,
 			everWasmPages:          s.arbExtraData.everWasmPages,
@@ -825,9 +829,15 @@ func (s *StateDB) Copy() *StateDB {
 			state.arbExtraData.userWasms[call] = wasm
 		}
 	}
+<<<<<<< HEAD
 	for moduleHash, info := range s.arbExtraData.activatedWasms {
 		// It's fine to skip a deep copy since activations are immutable.
 		state.arbExtraData.activatedWasms[moduleHash] = info
+=======
+	for moduleHash, asmMap := range s.arbExtraData.activatedWasms {
+		// It's fine to skip a deep copy since activations are immutable.
+		state.arbExtraData.activatedWasms[moduleHash] = asmMap
+>>>>>>> 64230029 (feat: arbos32)
 	}
 
 	// If there's a prefetcher running, make an inactive copy of it that can
@@ -1284,11 +1294,11 @@ func (s *StateDB) Commit(block uint64, deleteEmptyObjects bool) (common.Hash, er
 	}
 
 	// Arbitrum: write Stylus programs to disk
-	for moduleHash, info := range s.arbExtraData.activatedWasms {
-		rawdb.WriteActivation(wasmCodeWriter, moduleHash, info.Asm, info.Module)
+	for moduleHash, asmMap := range s.arbExtraData.activatedWasms {
+		rawdb.WriteActivation(wasmCodeWriter, moduleHash, asmMap)
 	}
 	if len(s.arbExtraData.activatedWasms) > 0 {
-		s.arbExtraData.activatedWasms = make(map[common.Hash]*ActivatedWasm)
+		s.arbExtraData.activatedWasms = make(map[common.Hash]ActivatedWasm)
 	}
 
 	if codeWriter.ValueSize() > 0 {
